@@ -139,3 +139,5 @@ GitHub.sublime-settings
 README
 /static/
 
+/.pre-commit-config.yaml
+/staticfiles/

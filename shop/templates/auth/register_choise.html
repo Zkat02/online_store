@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Register</h1>
+<h2>Choose your role in our application.</h2>
+<a href="{% url 'register_customer' %}"><button>Customer</button></a></li>
+<a href="{% url 'register_seller' %}"><button>Seller</button></a></li>
+{% endblock %}
