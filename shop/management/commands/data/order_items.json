@@ -1,0 +1,4 @@
+[
+    {"order_customer_username": "customer1", "product_name": "Smartphone", "quantity": 2},
+    {"order_customer_username": "customer2", "product_name": "Laptop", "quantity": 1}
+]

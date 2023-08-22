@@ -1,0 +1,4 @@
+[
+    {"username": "customer1", "phone_number": "123456789", "address": "123 Main St, City"},
+    {"username": "customer2", "phone_number": "987654321", "address": "456 Elm St, Town"}
+]
