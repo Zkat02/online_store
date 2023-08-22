@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Customer, Category, Product, Cart, CartItem, Order
+from .models import Customer, Category, Product, Cart, CartItem, Order, Seller
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import UserLoginForm, CustomerRegistrationForm, SellerRegistrationForm
@@ -17,6 +17,27 @@ def product_list(request):
 def product_detail(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     return render(request, "product_detail.html", {"product": product})
+
+
+def add_to_cart(request, product_id):
+    if request.user.is_authenticated:
+        product = get_object_or_404(Product, pk=product_id)
+        customer = request.user.customer
+
+        cart, created = Cart.objects.get_or_create(customer=customer)
+
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart, product=product, quantity=1
+        )
+
+        if not created:
+            cart_item.quantity += 1
+            cart_item.save()
+
+        return redirect("cart")
+
+    else:
+        return redirect("login")
 
 
 @login_required
@@ -43,6 +64,12 @@ def register_customer(request):
         form = CustomerRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            customer = Customer(
+                user=user,
+                phone_number=form.cleaned_data["phone_number"],
+                address=form.cleaned_data["address"],
+            )
+            customer.save()
             login(request, user)
             return redirect("home")
     else:
@@ -55,6 +82,12 @@ def register_seller(request):
         form = SellerRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            seller = Seller(
+                user=user,
+                seller_name=form.cleaned_data["seller_name"],
+                address=form.cleaned_data["address"],
+            )
+            seller.save()
             login(request, user)
             return redirect("home")
     else:

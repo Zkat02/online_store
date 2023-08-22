@@ -9,6 +9,7 @@ from .views import (
     register_seller,
     login_view,
     logout_view,
+    add_to_cart,
 )
 
 urlpatterns = [
@@ -21,4 +22,5 @@ urlpatterns = [
     path("register/seller/", register_seller, name="register_seller"),
     path("login/", login_view, name="login"),
     path("logout/", logout_view, name="logout"),
+    path("add_to_cart/<int:product_id>/", add_to_cart, name="add_to_cart"),
 ]

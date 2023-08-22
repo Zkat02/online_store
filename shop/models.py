@@ -9,7 +9,7 @@ class Customer(models.Model):
     address = models.TextField(blank=True)
 
     def __str__(self):
-        return f"Profile for {self.user.username}"
+        return f"{self.user.username}"
 
 
 class Seller(models.Model):
@@ -50,7 +50,7 @@ class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Cart #{self.id} - {self.user.username}"
+        return f"Cart #{self.id} - {self.customer}"
 
 
 class CartItem(models.Model):
