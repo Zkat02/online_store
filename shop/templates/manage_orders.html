@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}Order History{% endblock %}
+{% block title %}Manage Orders{% endblock %}
 
 {% block content %}
-    <h1>Your Order History</h1>
+    <h1>Manage Orders</h1>
     <ul>
         {% for order in orders %}
             <li>
@@ -13,7 +13,6 @@
                         <li>
                             <a href="{% url 'product_detail' item.product.id %}">{{ item.product.name }}</a>
                             - Quantity: {{ item.quantity }}
-                            - Price: {{ item.product.price }}
                         </li>
                     {% endfor %}
                 </ul>

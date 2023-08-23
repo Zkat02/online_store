@@ -141,3 +141,4 @@ README
 
 /.pre-commit-config.yaml
 /staticfiles/
+/.ruff_cache/

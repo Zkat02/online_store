@@ -35,6 +35,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
     image = models.ImageField(upload_to="products/", blank=True, null=True)
+    quantity = models.PositiveIntegerField()
 
     def __str__(self):
         return self.name
@@ -69,7 +70,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Order #{self.id} - {self.user.username}"
+        return f"Order #{self.id} - {self.customer}"
 
 
 class OrderItem(models.Model):

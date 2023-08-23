@@ -9,8 +9,15 @@
     <p>Category: {{ product.category }}</p>
     <p>Seller: {{ product.seller }}</p>
 
-    <form method="post" action="{% url 'add_to_cart' product.id %}">
-        {% csrf_token %}
-        <button type="submit">Add to Cart</button>
-    </form>
+    {% if user.is_authenticated %}
+        {% if user.customer %}
+            <form method="post" action="{% url 'add_to_cart' product.id %}">
+                {% csrf_token %}
+                <button type="submit">Add to Cart</button>
+            </form>
+        {% endif %}
+        {% if user.seller and product.seller.user == user %}
+            <button><a href="{% url 'edit_product' product.id %}">Edit Product</a></button>
+        {% endif %}
+    {% endif %}
 {% endblock %}

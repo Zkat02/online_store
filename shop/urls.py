@@ -10,6 +10,11 @@ from .views import (
     login_view,
     logout_view,
     add_to_cart,
+    place_order,
+    remove_from_cart,
+    create_product,
+    manage_orders,
+    edit_product,
 )
 
 urlpatterns = [
@@ -23,4 +28,13 @@ urlpatterns = [
     path("login/", login_view, name="login"),
     path("logout/", logout_view, name="logout"),
     path("add_to_cart/<int:product_id>/", add_to_cart, name="add_to_cart"),
+    path(
+        "remove_from_cart/<int:cart_item_id>/",
+        remove_from_cart,
+        name="remove_from_cart",
+    ),
+    path("place_order/", place_order, name="place_order"),
+    path("create_product/", create_product, name="create_product"),
+    path("manage_orders/", manage_orders, name="manage_orders"),
+    path("product/<int:product_id>/edit/", edit_product, name="edit_product"),
 ]
