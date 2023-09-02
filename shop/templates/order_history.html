@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Order History{% endblock %}
+
+{% block content %}
+    <h1>Your Order History</h1>
+    <ul>
+        {% for order in orders %}
+            <li>
+                Order #{{ order.id }} - Total Price: ${{ order.total_price }}
+                <ul>
+                    {% for item in order.orderitem_set.all %}
+                        <li>
+                            <a href="{% url 'product_detail' item.product.id %}">{{ item.product.name }}</a>
+                            - Quantity: {{ item.quantity }}
+                            - Price: {{ item.product.price }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

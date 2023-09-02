@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Cart{% endblock %}
+
+{% block content %}
+    <h1>Your Cart</h1>
+    <form method="post" action="{% url 'place_order' %}">
+        {% csrf_token %}
+        <ul>
+            {% for item in cart_items %}
+                <li>
+                    <input type="checkbox" name="selected_items" value="{{ item.id }}">
+                    {{ item.product.name }} - Quantity: {{ item.quantity }}
+                     <button><a href="{% url 'remove_from_cart' item.id %}">Remove</a></button>
+                    {% if item.quantity > 1 %}
+                        <input type="number" name="quantity_{{ item.id }}" value="{{ item.quantity }}" min="1">
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        <button type="submit">Place Order</button>
+    </form>
+{% endblock %}

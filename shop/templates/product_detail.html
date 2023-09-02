@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - Product Detail{% endblock %}
+
+{% block content %}
+    <h1>{{ product.name }}</h1>
+    <p>{{ product.description }}</p>
+    <p>Price: ${{ product.price }}</p>
+    <p>Category: {{ product.category }}</p>
+    <p>Seller: {{ product.seller }}</p>
+
+    {% if user.is_authenticated %}
+        {% if user.customer %}
+            <form method="post" action="{% url 'add_to_cart' product.id %}">
+                {% csrf_token %}
+                <button type="submit">Add to Cart</button>
+            </form>
+        {% endif %}
+        {% if user.seller and product.seller.user == user %}
+            <button><a href="{% url 'edit_product' product.id %}">Edit Product</a></button>
+        {% endif %}
+    {% endif %}
+{% endblock %}

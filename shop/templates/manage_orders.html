@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Orders{% endblock %}
+
+{% block content %}
+    <h1>Manage Orders</h1>
+    <ul>
+        {% for order in orders %}
+            <li>
+                Order #{{ order.id }} - Total Price: ${{ order.total_price }}
+                <ul>
+                    {% for item in order.orderitem_set.all %}
+                        <li>
+                            <a href="{% url 'product_detail' item.product.id %}">{{ item.product.name }}</a>
+                            - Quantity: {{ item.quantity }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
