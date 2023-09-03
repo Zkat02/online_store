@@ -21,8 +21,9 @@ from .forms import (
 from django.contrib import messages
 from decimal import Decimal
 from django.db import transaction
-from .serializers import CustomerSerializer, ProductSerializer
+from .serializers import CustomerSerializer, ProductSerializer, CategorySerializer
 from rest_framework import generics, mixins
+from rest_framework import viewsets
 from rest_framework.viewsets import GenericViewSet
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
@@ -50,6 +51,11 @@ class ProductViewSet(
 ):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 
 class ProductsByCategory(ListView):

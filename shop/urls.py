@@ -18,11 +18,14 @@ from .views import (
     ProductsByCategory,
     CustomerList,
     ProductViewSet,
+    CategoryViewSet,
 )
 from rest_framework import routers
 
 router = routers.SimpleRouter()
 router.register(r"products", ProductViewSet)
+router.register(r"category", CategoryViewSet)
+
 
 urlpatterns = [
     path("api/", include(router.urls)),
