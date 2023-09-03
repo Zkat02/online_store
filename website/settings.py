@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-29xl-t6@fjm%#*d1#p7-=p-o(9h3kglgrt=ef@@9y9nc3g=@ko
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "debug_toolbar",
     "shop.apps.ShopConfig",
 ]
 
@@ -49,6 +50,7 @@ MIDDLEWARE = [
     # 'shop.middlewares.cart_context_middleware.CartContextMiddleware',
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     # 'shop.middlewares.request_timing_middleware.RequestTimingMiddleware',
 ]
 
@@ -143,3 +145,19 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 MEDIA_URL = "/media/"
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
+        # appends key names with a prefix and a version to help distinguish similar keys
+        "KEY_PREFIX": "shop",
+    }
+}
+
+CACHE_TTL = 60 * 15  # Cache time to live is 15 minutes.

@@ -24,8 +24,13 @@ from django.db import transaction
 from .serializers import CustomerSerializer, ProductSerializer
 from rest_framework import generics, mixins
 from rest_framework.viewsets import GenericViewSet
+from django.conf import settings
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from django.views.decorators.cache import cache_page
 
 # from rest_framework.permissions import IsAdminUser
+
+CACHE_TTL = getattr(settings, "CACHE_TTL", DEFAULT_TIMEOUT)
 
 
 class CustomerList(generics.ListCreateAPIView):
@@ -75,6 +80,7 @@ def product_list(request):
     )
 
 
+@cache_page(CACHE_TTL)
 def product_detail(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     return render(request, "product_detail.html", {"product": product})
