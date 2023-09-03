@@ -7,7 +7,7 @@
     <ul>
         {% for order in orders %}
             <li>
-                Order #{{ order.id }} - Total Price: ${{ order.total_price }}
+                <h3>Order #{{ order.id }} - Total Price: ${{ order.total_price }}</h3>
                 <ul>
                     {% for item in order.orderitem_set.all %}
                         <li>

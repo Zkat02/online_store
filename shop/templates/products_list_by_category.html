@@ -5,17 +5,13 @@
 {% block content %}
     <h1>Welcome to our Online Store</h1>
 
-    <h2>Categories</h2>
-    <ul>
-        {% for category in categories %}
-            <li><a href="{%url 'category' category.id%}">{{ category.name }}</a></li>
-        {% endfor %}
-    </ul>
-
+    <h2>Category: {{category_name}}</h2>
+    <button><a href="{% url 'home' %}">All</a></button>
     <h2>Products</h2>
     <ul>
         {% for product in products %}
             <li><a href="{% url 'product_detail' product.id %}">{{ product.name }}</a></li>
         {% endfor %}
     </ul>
+
 {% endblock %}

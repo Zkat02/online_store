@@ -9,6 +9,7 @@ from .models import (
     OrderItem,
     Seller,
 )
+from django.views.generic import ListView
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import (
@@ -20,6 +21,50 @@ from .forms import (
 from django.contrib import messages
 from decimal import Decimal
 from django.db import transaction
+from .serializers import CustomerSerializer, ProductSerializer
+from rest_framework import generics, mixins
+from rest_framework.viewsets import GenericViewSet
+
+# from rest_framework.permissions import IsAdminUser
+
+
+class CustomerList(generics.ListCreateAPIView):
+    # ListCreateAPIView: provides get and post method handlers.
+
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
+    # permission_classes = [IsAdminUser]
+
+
+class ProductViewSet(
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    GenericViewSet,
+):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+
+class ProductsByCategory(ListView):
+    model = Product
+    template_name = "products_list_by_category.html"
+    context_object_name = "products"
+    allow_empty = False
+    # paginate_by = 2
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["category_name"] = Category.objects.get(
+            pk=self.kwargs["category_id"]
+        ).name
+        return context
+
+    def get_queryset(self):
+        return Product.objects.filter(
+            category_id=self.kwargs["category_id"]
+        ).select_related("category")
 
 
 def product_list(request):

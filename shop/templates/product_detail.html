@@ -19,5 +19,9 @@
         {% if user.seller and product.seller.user == user %}
             <button><a href="{% url 'edit_product' product.id %}">Edit Product</a></button>
         {% endif %}
+    {% else %}
+        <h3> To make a purchase please <a href="{% url 'login'%}">login</a> or <a href="{% url 'register'%}">register</a>.</h3>
+
     {% endif %}
+    <button><a href="{% url 'home' %}">To products</a></button>
 {% endblock %}
