@@ -21,6 +21,10 @@ from .views import (
     CategoryViewSet,
 )
 from rest_framework import routers
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 router = routers.SimpleRouter()
 router.register(r"products", ProductViewSet)
@@ -50,4 +54,6 @@ urlpatterns = [
     path("product/<int:product_id>/edit/", edit_product, name="edit_product"),
     path("category/<int:category_id>", ProductsByCategory.as_view(), name="category"),
     path("api/customer_list/", CustomerList.as_view(), name="customer_list"),
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
