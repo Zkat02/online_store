@@ -6,18 +6,22 @@
     <h1>Your Cart</h1>
     <form method="post" action="{% url 'place_order' %}">
         {% csrf_token %}
+        {% if cart_items %}
         <ul>
             {% for item in cart_items %}
                 <li>
                     <input type="checkbox" name="selected_items" value="{{ item.id }}">
-                    {{ item.product.name }} - Quantity: {{ item.quantity }}
-                     <button><a href="{% url 'remove_from_cart' item.id %}">Remove</a></button>
-                    {% if item.quantity > 1 %}
-                        <input type="number" name="quantity_{{ item.id }}" value="{{ item.quantity }}" min="1">
-                    {% endif %}
+                    <a href="{% url 'product_detail' item.product.id %}">{{ item.product.name }}</a>
+                    <button><a href="{% url 'remove_from_cart' item.id %}">Remove</a></button>
+                    <input type="number" name="quantity_{{ item.id }}" value="{{ item.quantity }}" min="1">
+
                 </li>
             {% endfor %}
         </ul>
         <button type="submit">Place Order</button>
+
+        {% else %}
+        <h3>Your cart empty :( <br>Find some <a href="{% url 'home' %}">here</a></h3>
+        {% endif %}
     </form>
 {% endblock %}
