@@ -27,11 +27,44 @@ from rest_framework import viewsets
 from rest_framework.viewsets import GenericViewSet
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
-from django.views.decorators.cache import cache_page
 
+# from django.views.decorators.cache import cache_page
+
+# from rest_framework.response import Response
 # from rest_framework.permissions import IsAdminUser
+# from rest_framework.views import APIView
+from django.http import JsonResponse
+from .tasks import generate_seller_report
+from celery.result import AsyncResult
 
 CACHE_TTL = getattr(settings, "CACHE_TTL", DEFAULT_TIMEOUT)
+
+
+def seller_report(request, seller_id):
+    # start Celery task
+    task_result = generate_seller_report.delay(seller_id, request.user.id)
+
+    # Save task_id in session or in BD
+    request.session["task_id"] = task_result.id
+
+    return JsonResponse(
+        {
+            "task_id": task_result.id,
+            "get_task_result": f"http://localhost:8000/get_task_result/{task_result.id}",
+        }
+    )
+
+
+def get_task_result(request, task_id):
+    task = AsyncResult(task_id)
+    # checking of task status (PENDING', 'SUCCESS', 'FAILURE' and ...)
+    if task.state == "SUCCESS":
+        return JsonResponse({"status": "SUCCESS", "result": task.result})
+    elif task.state == "FAILURE":
+        return JsonResponse({"status": "FAILURE", "error_message": task.result})
+    else:
+        # the task is still running or in the queue, return the status
+        return JsonResponse({"status": task.state})
 
 
 class CustomerList(generics.ListCreateAPIView):
@@ -63,6 +96,7 @@ class ProductsByCategory(ListView):
     template_name = "products_list_by_category.html"
     context_object_name = "products"
     allow_empty = False
+
     # paginate_by = 2
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -86,7 +120,7 @@ def product_list(request):
     )
 
 
-@cache_page(CACHE_TTL)
+# @cache_page(CACHE_TTL)
 def product_detail(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     return render(request, "product_detail.html", {"product": product})
