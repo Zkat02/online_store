@@ -32,6 +32,6 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def validate_price(self, value):
-        if not value < 0:
+        if value < 0:
             raise serializers.ValidationError("Price can not be negative")
         return value

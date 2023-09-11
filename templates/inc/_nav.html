@@ -16,6 +16,7 @@
                         <li><a href="{% url 'manage_orders' %}">Manage Orders</a></li>
                     {% endif %}
                 {% endif %}
+                <li><a href="{% url 'create_and_list_reports' %}">Reports</a></li>
                 <li><a href="{% url 'logout' %}">Logout</a></li>
             {% else %}
                 <li><a href="{% url 'login' %}">Login</a></li>

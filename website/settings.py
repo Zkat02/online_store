@@ -80,28 +80,28 @@ WSGI_APPLICATION = "website.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 # settings for local machine
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "online_store",
-        "USER": "postgres",
-        "PASSWORD": "root",
-        "HOST": "localhost",
-        "PORT": "5432",
-    }
-}
-
-# # settings for Docker
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": os.environ.get("POSTGRES_NAME"),
-#         "USER": os.environ.get("POSTGRES_USER"),
-#         "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-#         "HOST": "db",
-#         "PORT": 5432,
+#         "NAME": "online_store",
+#         "USER": "postgres",
+#         "PASSWORD": "root",
+#         "HOST": "localhost",
+#         "PORT": "5432",
 #     }
 # }
+
+# # settings for Docker
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("POSTGRES_NAME"),
+        "USER": os.environ.get("POSTGRES_USER"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+        "HOST": "db",
+        "PORT": 5432,
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -151,15 +151,17 @@ INTERNAL_IPS = [
     "127.0.0.1",
 ]
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
-        # appends key names with a prefix and a version to help distinguish similar keys
-        "KEY_PREFIX": "shop",
-    }
-}
+# settings for local machine (needed: run docker run my-redis)
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": "redis://127.0.0.1:6379/1",
+#         "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
+#         # appends key names with a prefix and a version
+#         # to help distinguish similar keys
+#         "KEY_PREFIX": "shop",
+#     }
+# }
 
 CACHE_TTL = 60 * 15  # Cache time to live is 15 minutes.
 
@@ -212,3 +214,9 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
+
+# Celery settings
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+# CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = "json"

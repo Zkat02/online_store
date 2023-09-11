@@ -1,1 +1,49 @@
-Online store
+# Online store
+
+
+## Installation
+
+Clone the repository:
+
+git clone https://github.com/your_local_repository.git
+
+Create a virtual environment and activate it:
+
+python -m venv venv
+
+source venv/bin/activate
+
+Install dependencies:
+
+pip install -r requirements.txt
+
+Create redis server:
+
+docker run --name redis -p 6379:6379 -d redis
+
+Apply migrations:
+
+python manage.py migrate
+
+Run the local server:
+
+python manage.py runserver
+
+Now the project is accessible at http://localhost:8000/.
+
+
+## Installation with docker
+
+docker-compose build
+docker-compose up -d web
+docker-compose exec web python3 manage.py migrate
+
+run this commamnd to quickly fill the database with data:
+docker-compose exec web python3 manage.py populate_data
+
+
+## Contact
+If users or developers have questions, they can reach out to you. Provide contact information or ways to get in touch, such as:
+
+Author: Kate Zinchenko
+Email: zkatnull2@gmail.com

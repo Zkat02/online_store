@@ -8,6 +8,8 @@
     <p>Price: ${{ product.price }}</p>
     <p>Category: {{ product.category }}</p>
     <p>Seller: {{ product.seller }}</p>
+    <p>Quantity in stock: {{ product.quantity }}</p>
+
 
     {% if user.is_authenticated %}
         {% if user.customer %}

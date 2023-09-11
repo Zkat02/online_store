@@ -4,6 +4,7 @@
 
 {% block content %}
     <h1>Your Order History</h1>
+    {% if orders %}
     <ul>
         {% for order in orders %}
             <li>
@@ -13,11 +14,15 @@
                         <li>
                             <a href="{% url 'product_detail' item.product.id %}">{{ item.product.name }}</a>
                             - Quantity: {{ item.quantity }}
-                            - Price: {{ item.product.price }}
+                            - Price for 1: {{ item.product.price }}
                         </li>
                     {% endfor %}
                 </ul>
             </li>
         {% endfor %}
+        <h3>Great! Happy shopping <a href="{% url 'cart' %}">here</a>:)</h3>
     </ul>
+    {% else %}
+        <h3>Your Order History clean :( <br>Place order <a href="{% url 'cart' %}">here</a></h3>
+    {% endif %}
 {% endblock %}

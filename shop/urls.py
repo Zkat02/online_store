@@ -19,6 +19,11 @@ from .views import (
     CustomerList,
     ProductViewSet,
     CategoryViewSet,
+    seller_report,
+    get_task_result,
+    report_detail,
+    delete_report,
+    create_and_list_reports,
 )
 from rest_framework import routers
 from rest_framework_simplejwt.views import (
@@ -29,7 +34,6 @@ from rest_framework_simplejwt.views import (
 router = routers.SimpleRouter()
 router.register(r"products", ProductViewSet)
 router.register(r"category", CategoryViewSet)
-
 
 urlpatterns = [
     path("api/", include(router.urls)),
@@ -56,4 +60,13 @@ urlpatterns = [
     path("api/customer_list/", CustomerList.as_view(), name="customer_list"),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/seller_report/<int:seller_id>/", seller_report, name="seller_report"),
+    path("api/get_task_result/<str:task_id>/", get_task_result, name="get_task_result"),
+    path(
+        "create_and_list_reports/",
+        create_and_list_reports,
+        name="create_and_list_reports",
+    ),
+    path("report_detail/<int:report_id>/", report_detail, name="report_detail"),
+    path("delete_report/<int:report_id>/", delete_report, name="delete_report"),
 ]

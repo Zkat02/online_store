@@ -81,7 +81,7 @@ form {
 input[type="text"],
 input[type="password"],
 textarea {
-    width: 100%;
+    width: 95%;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
@@ -89,7 +89,7 @@ textarea {
 }
 
 /* Стили для кнопки */
-button[type="submit"] {
+button {
     background-color: #007bff;
     color: #fff;
     border: none;
@@ -98,8 +98,17 @@ button[type="submit"] {
     cursor: pointer;
 }
 
-button[type="submit"]:hover {
+button:hover {
     background-color: #0056b3;
+}
+button:hover a{
+    background-color: #0056b3;
+    text-decoration: none;
+}
+
+button a {
+    color: #fff;
+    text-decoration: none;
 }
 
 /* Стили для ссылок */
@@ -111,4 +120,15 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table th,
+table td {
+    padding: 10px;
+    text-align: left;
 }

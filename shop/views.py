@@ -8,6 +8,7 @@ from .models import (
     Order,
     OrderItem,
     Seller,
+    SellerReport,
 )
 from django.views.generic import ListView
 from django.contrib.auth import login, logout
@@ -17,6 +18,7 @@ from .forms import (
     CustomerRegistrationForm,
     SellerRegistrationForm,
     ProductForm,
+    ReportForm,
 )
 from django.contrib import messages
 from decimal import Decimal
@@ -27,11 +29,97 @@ from rest_framework import viewsets
 from rest_framework.viewsets import GenericViewSet
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
-from django.views.decorators.cache import cache_page
 
+# from django.views.decorators.cache import cache_page
+
+# from rest_framework.response import Response
 # from rest_framework.permissions import IsAdminUser
+# from rest_framework.views import APIView
+from django.http import JsonResponse
+from .tasks import generate_seller_report
+from celery.result import AsyncResult
 
 CACHE_TTL = getattr(settings, "CACHE_TTL", DEFAULT_TIMEOUT)
+
+
+def seller_report(request, seller_id):
+    # start Celery task
+    task_result = generate_seller_report.delay(seller_id, request.user.id)
+
+    # Save task_id in session or in BD
+    request.session["task_id"] = task_result.id
+
+    return JsonResponse(
+        {
+            "task_id": task_result.id,
+            "get_task_result": f"http://localhost:8000/get_task_result/{task_result.id}",
+        }
+    )
+
+
+def get_task_result(request, task_id):
+    task = AsyncResult(task_id)
+    # checking of task status (PENDING', 'SUCCESS', 'FAILURE' and ...)
+    if task.state == "SUCCESS":
+        return JsonResponse({"status": "SUCCESS", "result": task.result})
+    elif task.state == "FAILURE":
+        return JsonResponse({"status": "FAILURE", "error_message": task.result})
+    else:
+        # the task is still running or in the queue, return the status
+        return JsonResponse({"status": task.state})
+
+
+def create_and_list_reports(request):
+    if request.method == "POST":
+        form = ReportForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            seller = form.cleaned_data["seller"]
+
+            # start Celery task
+            task_result = generate_seller_report.delay(
+                seller.id, request.user.id, title
+            )
+            # save task_id in session (may in BD)
+            request.session["task_id"] = task_result.id
+
+            messages.success(
+                request,
+                "Your report is being created. It will be available in your reports.",
+            )
+            return redirect("create_and_list_reports")
+    else:
+        form = ReportForm()
+
+    # Получение списка отчетов пользователя
+    reports = SellerReport.objects.filter(user=request.user)
+
+    return render(
+        request, "create_and_list_reports.html", {"form": form, "reports": reports}
+    )
+
+
+def report_detail(request, report_id):
+    report = SellerReport.objects.get(id=report_id)
+    task = AsyncResult(report.task_id)
+
+    if task.state == "SUCCESS":
+        context = {
+            "report": report,
+            "task_status": task.state,
+            "task_result": task.result,
+        }
+        return render(request, "report_detail.html", context)
+    elif task.state == "FAILURE":
+        return JsonResponse({"status": "FAILURE", "error_message": task.result})
+    else:
+        return JsonResponse({"status": task.state})
+
+
+def delete_report(request, report_id):
+    report = SellerReport.objects.get(id=report_id)
+    report.delete()
+    return redirect("create_and_list_reports")
 
 
 class CustomerList(generics.ListCreateAPIView):
@@ -63,6 +151,7 @@ class ProductsByCategory(ListView):
     template_name = "products_list_by_category.html"
     context_object_name = "products"
     allow_empty = False
+
     # paginate_by = 2
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -86,7 +175,7 @@ def product_list(request):
     )
 
 
-@cache_page(CACHE_TTL)
+# @cache_page(CACHE_TTL)
 def product_detail(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     return render(request, "product_detail.html", {"product": product})

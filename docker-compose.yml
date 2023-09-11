@@ -20,3 +20,25 @@ services:
       - POSTGRES_PASSWORD=postgres
     depends_on:
       - db
+      - redis
+      - celery
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+  celery:
+#    build: ./website
+    build: .
+    command: celery -A website worker --loglevel=info
+    volumes:
+      - .:/code
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - DJANGO_SETTINGS_MODULE=website.settings
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0 # /0 - default DB for Redis
+    depends_on:
+      - db
+      - redis

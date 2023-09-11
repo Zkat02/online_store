@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Seller Report{% endblock %}
+
+{% block content %}
+ <h1>List of Reports</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create Report</button>
+    </form>
+
+    <table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Seller</th>
+            <th>Created</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in reports %}
+        <tr>
+            <td>
+                <a href="{% url 'report_detail' report.id %}"><strong>{{ report.title }}</strong></a>
+            </td>
+            <td>{{ report.seller }}</td>
+            <td><strong>{{ report.created_at|date:"d.m.y H:i"}}</strong></td>
+            <td>
+                <button><a href="{% url 'delete_report' report.id %}">Delete</a></button>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No reports available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

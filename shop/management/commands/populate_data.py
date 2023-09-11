@@ -77,6 +77,7 @@ class Command(BaseCommand):
                     price=data["price"],
                     category=category,
                     seller=seller,
+                    quantity=data["quantity"],
                 )
                 self.stdout.write(self.style.SUCCESS(f'Product {data["name"]} created'))
 
