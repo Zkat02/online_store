@@ -80,3 +80,27 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.product.name} (Qty: {self.quantity})"
+
+
+class SellerReport(models.Model):
+    # the id of the celery task that generated the result
+    task_id = models.CharField(
+        blank=False,
+        max_length=255,
+        null=False,
+        verbose_name="celery task_id",
+        db_index=True,
+    )
+    title = models.CharField(max_length=255, verbose_name="report title")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
+    result = models.TextField(blank=False, verbose_name="result")
+    created_at = models.DateTimeField(
+        auto_now_add=True, db_index=True, editable=False, verbose_name="created_at"
+    )
+
+    def __str__(self):
+        if self.title:
+            return self.title
+        else:
+            return f"report#{self.id} to {self.seller.seler_name}"

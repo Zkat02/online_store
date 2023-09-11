@@ -8,6 +8,7 @@ from .models import (
     Order,
     OrderItem,
     Seller,
+    SellerReport,
 )
 from django.views.generic import ListView
 from django.contrib.auth import login, logout
@@ -17,6 +18,7 @@ from .forms import (
     CustomerRegistrationForm,
     SellerRegistrationForm,
     ProductForm,
+    ReportForm,
 )
 from django.contrib import messages
 from decimal import Decimal
@@ -65,6 +67,59 @@ def get_task_result(request, task_id):
     else:
         # the task is still running or in the queue, return the status
         return JsonResponse({"status": task.state})
+
+
+def create_and_list_reports(request):
+    if request.method == "POST":
+        form = ReportForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            seller = form.cleaned_data["seller"]
+
+            # start Celery task
+            task_result = generate_seller_report.delay(
+                seller.id, request.user.id, title
+            )
+            # save task_id in session (may in BD)
+            request.session["task_id"] = task_result.id
+
+            messages.success(
+                request,
+                "Your report is being created. It will be available in your reports.",
+            )
+            return redirect("create_and_list_reports")
+    else:
+        form = ReportForm()
+
+    # Получение списка отчетов пользователя
+    reports = SellerReport.objects.filter(user=request.user)
+
+    return render(
+        request, "create_and_list_reports.html", {"form": form, "reports": reports}
+    )
+
+
+def report_detail(request, report_id):
+    report = SellerReport.objects.get(id=report_id)
+    task = AsyncResult(report.task_id)
+
+    if task.state == "SUCCESS":
+        context = {
+            "report": report,
+            "task_status": task.state,
+            "task_result": task.result,
+        }
+        return render(request, "report_detail.html", context)
+    elif task.state == "FAILURE":
+        return JsonResponse({"status": "FAILURE", "error_message": task.result})
+    else:
+        return JsonResponse({"status": task.state})
+
+
+def delete_report(request, report_id):
+    report = SellerReport.objects.get(id=report_id)
+    report.delete()
+    return redirect("create_and_list_reports")
 
 
 class CustomerList(generics.ListCreateAPIView):

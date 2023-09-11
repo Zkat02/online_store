@@ -1,7 +1,12 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Product
+from .models import Product, Seller
+
+
+class ReportForm(forms.Form):
+    title = forms.CharField(max_length=255, required=False)
+    seller = forms.ModelChoiceField(queryset=Seller.objects.all(), required=True)
 
 
 class UserLoginForm(AuthenticationForm):
