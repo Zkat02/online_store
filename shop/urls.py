@@ -25,7 +25,8 @@ from .views import (
     delete_report,
     create_and_list_reports,
     UserCustomerViewSet,
-    RegistrationView
+    CustomerRegistrationView,
+    SellerRegistrationView
 )
 from rest_framework import routers
 from rest_framework_simplejwt.views import (
@@ -42,7 +43,8 @@ router.register(r'users/customers', UserCustomerViewSet)
 urlpatterns = [
     # api
     path("api/", include(router.urls)),
-    path('api/registration/customer/', RegistrationView.as_view(), name='registration-customer'),
+    path('api/registration/customer/', CustomerRegistrationView.as_view(), name='registration-customer'),
+    path('api/registration/seller/', SellerRegistrationView.as_view(), name='registration-seller'),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),

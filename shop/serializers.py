@@ -3,15 +3,39 @@ from .models import (
     Customer,
     Category,
     Product,
-    User
+    User,
     # Cart,
     # CartItem,
     # Order,
     # OrderItem,
-    # Seller,
+    Seller,
 )
 from djoser.serializers import UserCreateSerializer
 from django.contrib.auth import get_user_model
+
+
+class SellerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Seller
+        fields = ('seller_name', 'address')
+
+
+class UserSellerSerializer(serializers.HyperlinkedModelSerializer):
+    seller = SellerSerializer(required=True)
+
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'username', 'password', 'seller')
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        seller_data = validated_data.pop('seller')
+        password = validated_data.pop('password')
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        Seller.objects.create(user=user, **seller_data)
+        return user
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -20,7 +44,7 @@ class CustomerSerializer(serializers.ModelSerializer):
         fields = ('phone_number', 'address')
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserCustomerSerializer(serializers.HyperlinkedModelSerializer):
     customer = CustomerSerializer(required=True)
 
     class Meta:
