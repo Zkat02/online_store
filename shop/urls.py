@@ -24,19 +24,30 @@ from .views import (
     report_detail,
     delete_report,
     create_and_list_reports,
+    UserCustomerViewSet,
+    RegistrationView
 )
 from rest_framework import routers
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
+    TokenVerifyView,
 )
 
 router = routers.SimpleRouter()
-router.register(r"products", ProductViewSet)
-router.register(r"category", CategoryViewSet)
+router.register(r"products", ProductViewSet, basename='products')
+router.register(r"category", CategoryViewSet, basename='category')
+router.register(r'users/customers', UserCustomerViewSet)
 
 urlpatterns = [
+    # api
     path("api/", include(router.urls)),
+    path('api/registration/customer/', RegistrationView.as_view(), name='registration-customer'),
+    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+
+    # django templates
     path("", product_list, name="home"),
     path("product/<int:product_id>/", product_detail, name="product_detail"),
     path("cart/", cart, name="cart"),
@@ -58,8 +69,6 @@ urlpatterns = [
     path("product/<int:product_id>/edit/", edit_product, name="edit_product"),
     path("category/<int:category_id>", ProductsByCategory.as_view(), name="category"),
     path("api/customer_list/", CustomerList.as_view(), name="customer_list"),
-    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/seller_report/<int:seller_id>/", seller_report, name="seller_report"),
     path("api/get_task_result/<str:task_id>/", get_task_result, name="get_task_result"),
     path(
@@ -67,6 +76,8 @@ urlpatterns = [
         create_and_list_reports,
         name="create_and_list_reports",
     ),
+
+    # celery reports
     path("report_detail/<int:report_id>/", report_detail, name="report_detail"),
     path("delete_report/<int:report_id>/", delete_report, name="delete_report"),
 ]

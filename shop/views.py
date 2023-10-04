@@ -9,6 +9,7 @@ from .models import (
     OrderItem,
     Seller,
     SellerReport,
+    User,
 )
 from django.views.generic import ListView
 from django.contrib.auth import login, logout
@@ -23,23 +24,54 @@ from .forms import (
 from django.contrib import messages
 from decimal import Decimal
 from django.db import transaction
-from .serializers import CustomerSerializer, ProductSerializer, CategorySerializer
+from .serializers import ProductSerializer, CategorySerializer, UserSerializer, CustomerSerializer
 from rest_framework import generics, mixins
 from rest_framework import viewsets
 from rest_framework.viewsets import GenericViewSet
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
-
 # from django.views.decorators.cache import cache_page
-
-# from rest_framework.response import Response
+from rest_framework.response import Response
+from rest_framework import status
 # from rest_framework.permissions import IsAdminUser
-# from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
 from django.http import JsonResponse
 from .tasks import generate_seller_report
 from celery.result import AsyncResult
+from djoser.views import TokenCreateView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 CACHE_TTL = getattr(settings, "CACHE_TTL", DEFAULT_TIMEOUT)
+
+
+class RegistrationView(APIView):
+    # {
+    #     "email": "example@example.com",
+    #     "username": "example_user",
+    #     "password": "your_password",
+    #     "customer": {
+    #         "phone_number": "1234567890",
+    #         "address": "123 Main Street"
+    #     }
+    # }
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'user_id': user.id,
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh),
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserCustomerViewSet(viewsets.ModelViewSet):
+    # represent user linked with customer
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
 def seller_report(request, seller_id):
@@ -151,7 +183,6 @@ class ProductsByCategory(ListView):
     template_name = "products_list_by_category.html"
     context_object_name = "products"
     allow_empty = False
-
     # paginate_by = 2
 
     def get_context_data(self, *, object_list=None, **kwargs):
